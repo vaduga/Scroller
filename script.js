@@ -14,10 +14,10 @@ var items
 var indicators
 var prev_btn = document.querySelector('.prev')
 var next_btn = document.querySelector('.next')
-var state = {active: 0, auth: null, loadedPages: 2}
-const PAGE_SIZE = 2;
+var state = {active: 0, auth: null, loadedPages: 3, visibleIndicators: 2}
+const PAGE_SIZE = 3;
 const TOTAL_ITEMS = 10;
-const data = Array.from(Array(TOTAL_ITEMS)).map((_, i) => `Картинка ${i+1}`);  // БД для запросов
+const data = Array.from(Array(TOTAL_ITEMS)).map((v, i) => `Картинка ${i+1}`);  // БД для запросов
 let renderData = []  // рез
 
 var intersectionObserver = new IntersectionObserver(onObserve, {
@@ -25,9 +25,20 @@ var intersectionObserver = new IntersectionObserver(onObserve, {
   threshold: 0.6
 })
 
+
+async function lazyLoad() {
+  const result = await fetchData(state.loadedPages,PAGE_SIZE);
+  console.log("fetched+3")
+  console.log(result)
+  render(result);
+}
+
 function onObserve(entries) {         
   entries.forEach((entry) => {
-    if (entry.isIntersecting && entry.intersectionRatio >= 0.4) activate(items.indexOf(entry.target));
+    if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+      if (state.active==items.length-2) 
+      activate(items.indexOf(entry.target));
+    }
   })
 }
 
@@ -42,11 +53,9 @@ function render(someData){
  console.log(loadData)
  list.innerHTML = loadData.join('')
 items = Array.from(document.querySelectorAll(".item"))
-
-
  
-indicatorsRender = renderData.map(() => `<button class="indicator"></button>`)
-var indicatorsList = document.querySelector('.indicatorsList')
+let indicatorsRender = renderData.map(() => `<button class="indicator"></button>`)
+let indicatorsList = document.querySelector('.indicatorsList')
 indicatorsList.innerHTML = indicatorsRender.join('')
 
 
@@ -68,7 +77,7 @@ const fetchData = async (page, pageSize) => {
   setTimeout(
     () => {
       resolve(data.slice(page, page + pageSize));
-      state.loadedPages+=2
+      state.loadedPages+=3
       }, Math.random() * 1000 + 500  
   );
   
@@ -77,25 +86,18 @@ const fetchData = async (page, pageSize) => {
 
 
 
-
 prev_btn.addEventListener('click', ()=> items[state.active-1]?.scrollIntoView())
 
 next_btn.addEventListener('click', async ()=> { 
 
-
-
   items[state.active+1]?.scrollIntoView()
-  if (state.active==items.length-1) {
-    const result = await fetchData(state.loadedPages,PAGE_SIZE);
-    console.log("fetched+2")
-    console.log(result)
-    render(result);
-  }
+ 
 
 
   }
-
 )
+
+
 
 function activate(itemNumber) {
   state.active = itemNumber;
