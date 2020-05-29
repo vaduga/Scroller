@@ -1,21 +1,29 @@
-.viewport{  
-  margin-left: 35%;
-  margin-right: 35%;
+body{
+  display: flex;
+  justify-content: center;
+}
+
+.viewport{ 
+  width: 60%;
+  height: 60%;
 }
 
 .indicatorsList{
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 1vh;
 }
 
 .list {
   display: flex;
   overflow-x: scroll;
+  padding: 0;
+  margin: 0;
   scrollbar-width: none ;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   list-style: none;
-  padding: 0px;
-  border-radius: 13px;
+  border-radius: 1vh;
   border: 3px solid black;
 }
 
@@ -27,10 +35,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 50px;
-  text-shadow: 0px 3px 1px white; 
+  font-size: 5vh;
+  text-shadow: 0px 0.3vh 0.1vh white; 
   width: 100%;
-  height: 250px;
+  height: 40vh;
   flex-shrink: 0;
   scroll-snap-align: start; 
 }
@@ -45,9 +53,13 @@ li:nth-child(2n+1){
 
 .indicator{
   background: red;
-  width: 20px;
-  height: 20px;
+  width: 2vh;
+  height: 2vh;
   border-radius: 50%;
+  margin: 0 0.1vw;
+  cursor: pointer;
+  border: none;
+  outline: none;
 }
 
 .active{
@@ -56,20 +68,81 @@ li:nth-child(2n+1){
 
 .buttonGroup{
   position: relative;
+  height: 0;
 }
 
 .prev{
   position: absolute;
-  top: 150px;
-  left: 0px;
   cursor: pointer;
-  margin: 10px;
+  top: 0;
+  left: 0;
+  height: 40vh;
+  width: 5vw;
+  background-color: rgba(0,0,0,0);
+  border: none;
+  outline: none;
+  border-radius: 1vh;
 }
 
 .next{
   position: absolute;
-  top: 150px;
   cursor: pointer;
-  right: 0px;
-  margin: 10px;
+  top: 0;
+  right: 0;
+  height: 40vh;
+  width: 5vw;
+  background-color: rgba(0,0,0,0);
+  border: none;
+  outline: none;
+  border-radius: 1vh;
+}
+
+.prev:hover, .next:hover{
+  background-color: rgba(0,0,0,0.3);
+  border: none;
+}
+
+.Spinner {
+  margin: 20vh auto;
+  text-align: center;
+  position: relative;
+  font-size: 1vh;
+  display: block;
+}
+
+.Spinner:before,
+.Spinner:after {
+  position: absolute;
+  content: '';
+}
+
+.Spinner:before {
+  top: -5em;
+  left: -5em;
+  height: 10em;
+  width: 5em;
+  border-radius: 10em 0 0 10em;
+  background: red;
+  transform-origin: 5em 5em;
+  animation: load 2s infinite ease 0.5s;
+}
+
+.Spinner:after {
+  top: -5em;
+  left: 0;
+  height: 10em; 
+  width: 5em;
+  border-radius: 0 10em 10em 0;
+  background: red;
+  transform-origin: 0em 5em;
+  animation: load infinite ease 2s;
+}
+
+@keyframes load {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

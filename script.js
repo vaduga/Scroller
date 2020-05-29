@@ -14,7 +14,7 @@ var items
 var indicators
 var prev_btn = document.querySelector('.prev')
 var next_btn = document.querySelector('.next')
-var state = {active: 0, auth: null, loadedPages: 3, visibleIndicators: 2}
+var state = {active: 0, auth: null, loadedPages: 0}
 const PAGE_SIZE = 3;
 const TOTAL_ITEMS = 10;
 const data = Array.from(Array(TOTAL_ITEMS)).map((v, i) => `Картинка ${i+1}`);  // БД для запросов
@@ -27,7 +27,7 @@ var intersectionObserver = new IntersectionObserver(onObserve, {
 
 
 async function lazyLoad() {
-  const result = await fetchData(state.loadedPages,PAGE_SIZE);
+  const result = await fetchData(state.loadedPages, PAGE_SIZE);
   console.log("fetched+3")
   console.log(result)
   render(result);
@@ -36,14 +36,13 @@ async function lazyLoad() {
 function onObserve(entries) {         
   entries.forEach((entry) => {
     if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
-      if (state.active==items.length-2) 
       activate(items.indexOf(entry.target));
+      if (state.active == items.length-1) lazyLoad()
     }
   })
 }
 
-render(data.slice(0, state.loadedPages))   /* для начала покажем две картинки напрямую из базы (нехорошо!), а не с помощью функции fetchData, т.к. она асинхронная и запускается только с какого-нибудь обработчика событий (кнопки)  */
-
+window.onload = () => lazyLoad()
 
 
 function render(someData){
@@ -51,15 +50,15 @@ function render(someData){
  renderData = loadData
  loadData = loadData.map((el)=> `<li class="item">${el}</li>`)
  console.log(loadData)
- list.innerHTML = loadData.join('')
+ list.innerHTML = loadData.join('')  
 items = Array.from(document.querySelectorAll(".item"))
  
 let indicatorsRender = renderData.map(() => `<button class="indicator"></button>`)
 let indicatorsList = document.querySelector('.indicatorsList')
 indicatorsList.innerHTML = indicatorsRender.join('')
 
-
 indicators = document.querySelectorAll(".indicator")
+
 indicators.forEach((indicator, index) => {                      
 indicator.onclick = () => { items[index].scrollIntoView() }
 })
@@ -69,7 +68,6 @@ items.forEach((val) => intersectionObserver.observe(val))
 }
 
 
-
 const fetchData = async (page, pageSize) => {
   let resolve;
   const promise = new Promise(rs => (resolve = rs));
@@ -77,7 +75,7 @@ const fetchData = async (page, pageSize) => {
   setTimeout(
     () => {
       resolve(data.slice(page, page + pageSize));
-      state.loadedPages+=3
+      state.loadedPages+=PAGE_SIZE
       }, Math.random() * 1000 + 500  
   );
   
@@ -85,18 +83,9 @@ const fetchData = async (page, pageSize) => {
 };
 
 
-
 prev_btn.addEventListener('click', ()=> items[state.active-1]?.scrollIntoView())
 
-next_btn.addEventListener('click', async ()=> { 
-
-  items[state.active+1]?.scrollIntoView()
- 
-
-
-  }
-)
-
+next_btn.addEventListener('click', async ()=>  items[state.active+1]?.scrollIntoView())
 
 
 function activate(itemNumber) {
