@@ -28,9 +28,11 @@ var intersectionObserver = new IntersectionObserver(onObserve, {
 
 async function lazyLoad() {
   const result = await fetchData(state.loadedPages, PAGE_SIZE);
+  
   console.log("fetched+3")
   console.log(result)
-  result ? render(result) : console.log("No more lazy pictures for you!")
+  
+  render(result)
 }
 
 function onObserve(entries) {         
@@ -70,35 +72,21 @@ items.forEach((val) => intersectionObserver.observe(val))
 
 const fetchData = (page, pageSize) => {
   let promise = new Promise(function(resolve, reject){
-    if (data.length != page) {
-      if(data.length >= state.loadedPages+PAGE_SIZE){ 
-        state.loadedPages+=PAGE_SIZE; 
-        resolve(data.slice(page, page + pageSize));
-      }
-      else {state.loadedPages+=data.length - state.loadedPages; 
-        resolve(data.slice(page, state.loadedPages));}
-      }
+    if (page + pageSize <= data.length){
+      state.loadedPages += pageSize
+      resolve(data.slice(page, page+pageSize)); 
+    }
     else {
-      console.log("No more pictures!!")
-      reject("Nothing more")}
+      if (data.length-page !== 0){
+        state.loadedPages += (data.length-page)
+        resolve(data.slice(page, page + (data.length-page)))
+      }
+      else reject(new Error("Nothing more"))
+    }
   });
+  promise.catch((err)=>console.log(err))
   return promise;
 }  
-
-  //   let resolve;
-//   const promise = new Promise(rs => (resolve = rs));
-
-//   setTimeout(
-//     () => {
-//       resolve(data.slice(page, page + pageSize));
-//       state.loadedPages+=PAGE_SIZE
-//       }, Math.random() * 1000 + 500  
-//   );
-  
-//   return promise;
-
-
-// };
 
 
 prev_btn.addEventListener('click', ()=> items[state.active-1]?.scrollIntoView())
