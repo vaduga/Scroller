@@ -75,7 +75,7 @@ const fetchData = (page, pageSize) => {
 let cut = data.length - page
 pageSize = cut > pageSize ? pageSize : cut
 
-if (cut == 0) {throw new Error("Nothing more")}
+if (cut == 0) reject(new Error("Nothing more"))
 
   state.loadedPages += pageSize
   resolve(data.slice(page, page+pageSize)); 
