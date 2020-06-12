@@ -27,12 +27,11 @@ var intersectionObserver = new IntersectionObserver(onObserve, {
 
 
 async function lazyLoad() {
-  const result = await fetchData(state.loadedPages, PAGE_SIZE);
+  const result = await fetchData(state.loadedPages, PAGE_SIZE).catch(console.log);
   
-  console.log("fetched+3")
-  console.log(result)
-  
-  render(result)
+  console.log("fetched+3" + result)
+  if (!result) console.log('No more')
+   else render(result)
 }
 
 function onObserve(entries) {         
@@ -72,19 +71,17 @@ items.forEach((val) => intersectionObserver.observe(val))
 
 const fetchData = (page, pageSize) => {
   let promise = new Promise(function(resolve, reject){
-    if (page + pageSize <= data.length){
-      state.loadedPages += pageSize
-      resolve(data.slice(page, page+pageSize)); 
-    }
-    else {
-      if (data.length-page !== 0){
-        state.loadedPages += (data.length-page)
-        resolve(data.slice(page, page + (data.length-page)))
-      }
-      else reject(new Error("Nothing more"))
-    }
-  });
-  promise.catch((err)=>console.log(err))
+
+let cut = data.length - page
+pageSize = cut > pageSize ? pageSize : cut
+
+if (cut == 0) {throw new Error("Nothing more")}
+
+  state.loadedPages += pageSize
+  resolve(data.slice(page, page+pageSize)); 
+}
+  )
+promise.catch(console.log);
   return promise;
 }  
 
